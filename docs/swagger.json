@@ -326,6 +326,312 @@
           }
         }
       }
+    },
+    "/courses": {
+      "post": {
+        "tags": ["Courses"],
+        "summary": "Create a new course",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "عنوان دوره",
+                    "example": "دوره برنامه‌نویسی Node.js"
+                  },
+                  "teacherId": {
+                    "type": "string",
+                    "description": "شناسه کاربر با نقش TEACHER",
+                    "example": "60d0fe4f5311236168a109ca"
+                  }
+                },
+                "required": ["title", "teacherId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "دوره با موفقیت ایجاد شد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره با موفقیت ایجاد شد."
+                    },
+                    "course": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "شناسه مدرس معتبر نیست یا اطلاعات ناقص است",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "مدرس معتبر یافت نشد یا نقش اشتباه است."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Courses"],
+        "summary": "Get all courses (with optional title filter)",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "فیلتر دوره‌ها بر اساس عنوان (اختیاری)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "لیست دوره‌ها",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "courses": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Course"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{id}": {
+      "get": {
+        "tags": ["Courses"],
+        "summary": "Get course by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "شناسه دوره",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "اطلاعات دوره",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "course": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "دوره یافت نشد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره یافت نشد."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Courses"],
+        "summary": "Update a course",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "شناسه دوره",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "عنوان جدید دوره",
+                    "example": "دوره پیشرفته Node.js"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "دوره با موفقیت به‌روزرسانی شد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره با موفقیت به‌روزرسانی شد."
+                    },
+                    "course": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "دوره یافت نشد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره یافت نشد."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Courses"],
+        "summary": "Delete a course",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "شناسه دوره",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "دوره با موفقیت حذف شد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره با موفقیت حذف شد."
+                    },
+                    "course": {
+                      "$ref": "#/components/schemas/Course"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "دوره یافت نشد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "دوره یافت نشد."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Course": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f20a6f447b3a3f91a9870"
+          },
+          "title": {
+            "type": "string",
+            "example": "دوره برنامه‌نویسی Node.js"
+          },
+          "teacherId": {
+            "type": "string",
+            "description": "شناسه مدرس دوره",
+            "example": "60d0fe4f5311236168a109ca"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-10T09:25:43.511Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-10T09:25:43.511Z"
+          }
+        },
+        "required": ["title", "teacherId"]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     }
   },
   "components": {
@@ -373,7 +679,32 @@
           }
         },
         "required": ["phone"]
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "665f123abc456" },
+          "title": { "type": "string", "example": "دوره فیگما" },
+          "teacherId": {
+            "type": "string",
+            "description": "شناسه مدرس دوره",
+            "example": "60d0fe4f5311236168a109ca"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-10T09:25:43.511Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-10T09:25:43.511Z"
+          }
+        }
+        },
+        "required": ["title"]
       }
+      
     }
-  }
-}
+    }
+  

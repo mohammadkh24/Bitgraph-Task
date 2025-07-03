@@ -5,6 +5,7 @@ const path = require("path");
 const docsRoutes = require("./docs/swagger.routes")
 const authRoutes = require("./src/modules/auth/auth.routes")
 const usersRoutes = require("./src/modules/users/users.routes")
+const coursesRoutes = require("./src/modules/courses/courses.routes")
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(bodyParser.json());
 app.use("/doc" , docsRoutes);
 app.use("/auth" , authRoutes);
 app.use("/users" , usersRoutes);
+app.use("/courses" , coursesRoutes);
 
 // Not-fond page
 app.use((req,res) => {
