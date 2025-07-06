@@ -684,6 +684,55 @@
         "security": [{ "bearerAuth": [] }]
       }
     },
+    "/tasks/me": {
+      "get": {
+        "summary": "Get User Tasks",
+        "tags": ["Tasks"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "شماره صفحه برای صفحه‌بندی"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "تعداد آیتم‌ها در هر صفحه"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "لیست تمرین‌ها",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tasks": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    },
+                    "page": { "type": "integer" },
+                    "limit": { "type": "integer" },
+                    "totalPages": { "type": "integer" },
+                    "totalTasks": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "نیاز به احراز هویت"
+          },
+          "500": {
+            "description": "خطای سرور"
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
     "/tasks/{id}": {
       "get": {
         "summary": "Get A Task By Id",

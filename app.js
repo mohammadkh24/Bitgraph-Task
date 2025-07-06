@@ -7,6 +7,7 @@ const authRoutes = require("./src/modules/auth/auth.routes")
 const usersRoutes = require("./src/modules/users/users.routes")
 const coursesRoutes = require("./src/modules/courses/courses.routes")
 const tasksRoutes = require("./src/modules/tasks/tasks.routes")
+const feedbackRoutes = require("./src/modules/feedback/feedback.routes")
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/auth" , authRoutes);
 app.use("/users" , usersRoutes);
 app.use("/courses" , coursesRoutes);
 app.use("/tasks" , tasksRoutes);
+app.use("/feedback" , feedbackRoutes);
 
 // Not-fond page
 app.use((req,res) => {

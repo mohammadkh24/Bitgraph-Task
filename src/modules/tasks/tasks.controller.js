@@ -55,6 +55,7 @@ exports.getAllTasks = async (req, res) => {
     const tasks = await Task.find(filter)
       .populate("courseId", "title")
       .populate("userId", "username")
+      .populate("feedback")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -72,12 +73,40 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
+exports.getMyTasks = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+  
+      const total = await Task.countDocuments({ userId: req.user._id });
+  
+      const tasks = await Task.find({ userId: req.user._id })
+        .populate("courseId", "title")
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+  
+      res.json({
+        tasks,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalTasks: total,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "خطای سرور" });
+    }
+  };
+  
+
 exports.getTaskById = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id)
       .populate("courseId", "title")
       .populate("userId", "username")
-      .populate("feedback");
+      .populate("feedback" , "text");
 
     if (!task) {
       return res.status(404).json({ message: "تسک پیدا نشد." });

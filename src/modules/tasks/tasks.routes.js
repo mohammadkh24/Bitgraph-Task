@@ -17,6 +17,8 @@ router.post(
   controller.createTask
 );
 
+router.get("/me", auth, controller.getMyTasks);
+
 router.get("/",auth, isAdminOrTeacher ,controller.getAllTasks);
 
 router.get("/:id",auth, isAdminOrTeacher,controller.getTaskById);

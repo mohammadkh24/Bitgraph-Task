@@ -7,11 +7,13 @@ const schema = mongoose.Schema({
     },
     teacherId : {
         type : mongoose.Types.ObjectId,
-        ref : "User"
+        ref : "User",
+        required : true
     },
-    courseId : {
+    taskId : {
         type : mongoose.Types.ObjectId,
-        ref : "Course"
+        ref : "Course",
+        required : true
     },
 })
 
