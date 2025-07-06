@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "localhost"
+      "url": "https://bitgraph-task.onrender.com"
     }
   ],
   "tags": [
