@@ -836,119 +836,147 @@
         },
         "security": [{ "bearerAuth": [] }]
       }
-    } 
-  },
-  "components": {
-    "schemas": {
-      "Course": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "665f20a6f447b3a3f91a9870"
-          },
-          "title": {
-            "type": "string",
-            "example": "دوره برنامه‌نویسی Node.js"
-          },
-          "teacherId": {
-            "type": "string",
-            "description": "شناسه مدرس دوره",
-            "example": "60d0fe4f5311236168a109ca"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
+    },
+    "/feedback": {
+      "post": {
+        "tags": ["Feedback"],
+        "summary": "Create a new feedback",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateFeedbackRequest" }
+            }
           }
         },
-        "required": ["title", "teacherId"]
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "665f20a6f447b3a3f91a9870"
+        "responses": {
+          "201": {
+            "description": "Feedback created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FeedbackResponse" }
+              }
+            }
           },
-          "phone": {
-            "type": "string",
-            "example": "09123456789"
-          },
-          "username": {
-            "type": "string",
-            "example": "09123456789"
-          },
-          "avatar": {
-            "type": "string",
-            "example": "/images/OIP.jpg"
-          },
-          "role": {
-            "type": "string",
-            "enum": ["USER", "ADMIN", "TEACHER"],
-            "example": "USER"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
-          }
-        },
-        "required": ["phone"]
-      },
-      "Course": {
-        "type": "object",
-        "properties": {
-          "_id": { "type": "string", "example": "665f123abc456" },
-          "title": { "type": "string", "example": "دوره فیگما" },
-          "teacherId": {
-            "type": "string",
-            "description": "شناسه مدرس دوره",
-            "example": "60d0fe4f5311236168a109ca"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2025-06-10T09:25:43.511Z"
-          }
+          "404": { "description": "Task not found" },
+          "500": { "description": "Server error" }
         }
+      }
+    },
+    "/feedback/{id}": {
+      "patch": {
+        "tags": ["Feedback"],
+        "summary": "Update feedback",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Feedback ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateFeedbackRequest" }
+            }
+          }
         },
-        "required": ["title"]
+        "responses": {
+          "200": {
+            "description": "Feedback updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FeedbackResponse" }
+              }
+            }
+          },
+          "404": { "description": "Feedback not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "delete": {
+        "tags": ["Feedback"],
+        "summary": "Delete feedback",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Feedback ID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Feedback deleted" },
+          "404": { "description": "Feedback not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+  } 
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
       },
       "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "_id": { "type": "string", "example": "665f20a6f447b3a3f91a9870" },
+            "phone": { "type": "string", "example": "09123456789" },
+            "username": { "type": "string", "example": "09123456789" },
+            "avatar": { "type": "string", "example": "/images/OIP.jpg" },
+            "role": {
+              "type": "string",
+              "enum": ["USER", "ADMIN", "TEACHER"],
+              "example": "USER"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-06-10T09:25:43.511Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-06-10T09:25:43.511Z"
+            }
+          },
+          "required": ["phone"]
+        },
+        "Course": {
+          "type": "object",
+          "properties": {
+            "_id": { "type": "string", "example": "665f123abc456" },
+            "title": { "type": "string", "example": "دوره فیگما" },
+            "teacherId": {
+              "type": "string",
+              "description": "شناسه مدرس دوره",
+              "example": "60d0fe4f5311236168a109ca"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-06-10T09:25:43.511Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-06-10T09:25:43.511Z"
+            }
+          },
+          "required": ["title"]
+        },
         "Task": {
           "type": "object",
           "properties": {
@@ -957,9 +985,22 @@
             "file": { "type": "string", "example": "/tasks/file123.pdf" },
             "courseId": { "type": "string", "example": "64aaee1f..." },
             "userId": { "type": "string", "example": "64abbc33..." },
-            "status": { "type": "string", "enum": ["بررسی شده", "بررسی نشده"], "default": "بررسی نشده" },
-            "score": { "type": "number", "default": 0, "minimum": 0, "maximum": 10 },
-            "feedback": { "type": "string", "nullable": true, "example": "64addf11..." },
+            "status": {
+              "type": "string",
+              "enum": ["بررسی شده", "بررسی نشده"],
+              "default": "بررسی نشده"
+            },
+            "score": {
+              "type": "number",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 10
+            },
+            "feedback": {
+              "type": "string",
+              "nullable": true,
+              "example": "64addf11..."
+            },
             "createdAt": { "type": "string", "format": "date-time" },
             "updatedAt": { "type": "string", "format": "date-time" }
           }
@@ -977,7 +1018,10 @@
           "type": "object",
           "required": ["status"],
           "properties": {
-            "status": { "type": "string", "enum": ["بررسی شده", "بررسی نشده"] },
+            "status": {
+              "type": "string",
+              "enum": ["بررسی شده", "بررسی نشده"]
+            },
             "score": { "type": "number", "minimum": 1, "maximum": 10 }
           }
         },
@@ -986,9 +1030,54 @@
           "properties": {
             "description": { "type": "string", "example": "توضیحات جدید" }
           }
+        },
+        "CreateFeedbackRequest": {
+          "type": "object",
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "description": "ID of the task to give feedback for"
+            },
+            "text": {
+              "type": "string",
+              "description": "Feedback text"
+            }
+          },
+          "required": ["taskId", "text"]
+        },
+        "UpdateFeedbackRequest": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "Updated feedback text"
+            }
+          },
+          "required": ["text"]
+        },
+        "FeedbackResponse": {
+          "type": "object",
+          "properties": {
+            "message": { "type": "string" },
+            "feedback": {
+              "type": "object",
+              "properties": {
+                "_id": { "type": "string" },
+                "text": { "type": "string" },
+                "taskId": { "type": "string" },
+                "teacherId": { "type": "string" },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
         }
       }
-      
     }
-    }
-  
+}
