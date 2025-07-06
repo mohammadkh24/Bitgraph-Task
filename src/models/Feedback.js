@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const schema = mongoose.Schema({
-    description : {
+    text : {
         type : String,
         required : true
     },
@@ -15,6 +15,6 @@ const schema = mongoose.Schema({
     },
 })
 
-const model = mongoose.model("Course" , schema);
+const model = mongoose.model("Feedback" , schema);
 
 module.exports = model

@@ -25,6 +25,10 @@ const schema = mongoose.Schema(
       enum: ["بررسی شده", "بررسی نشده"],
       default: "بررسی نشده",
     },
+    score : {
+        type : Number,
+        default : 0
+    },
     feedback: {
       type: mongoose.Types.ObjectId,
       ref: "Feedback",

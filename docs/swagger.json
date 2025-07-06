@@ -592,7 +592,202 @@
           }
         }
       }
-    }
+    },
+    "/tasks": {
+      "post": {
+        "tags" : ["Tasks"],
+        "summary": "Add New Task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": { "type": "string" },
+                  "courseId": { "type": "string" },
+                  "file": { "type": "string", "format": "binary" }
+                },
+                "required": ["description", "courseId", "file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "تمرین با موفقیت ایجاد شد",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "newTask": { "$ref": "#/components/schemas/Task" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "خطا در درخواست (مثلا فایل آپلود نشده)" },
+          "404": { "description": "دوره پیدا نشد" },
+          "500": { "description": "خطای سرور" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "get": {
+        "summary": "Get All Tasks",
+        "tags" : ["Tasks"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "شماره صفحه"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "تعداد آیتم در هر صفحه"
+          },
+          {
+            "name": "courseId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "فیلتر بر اساس شناسه دوره"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "لیست تمرین‌ها با اطلاعات پیجینیشن",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tasks": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    },
+                    "page": { "type": "integer" },
+                    "limit": { "type": "integer" },
+                    "totalPages": { "type": "integer" },
+                    "totalTasks": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "نیاز به احراز هویت" },
+          "500": { "description": "خطای سرور" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "summary": "Get A Task By Id",
+        "tags" : ["Tasks"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "شناسه تمرین"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "اطلاعات تمرین",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "404": { "description": "تمرین پیدا نشد" },
+          "401": { "description": "نیاز به احراز هویت" },
+          "500": { "description": "خطای سرور" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/tasks/{id}/edit": {
+      "patch": {
+        "summary": "Edit Task (User)",
+        "tags": ["Tasks"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "شناسه تمرین"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EditTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "تمرین ویرایش شد",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "404": { "description": "تمرین پیدا نشد یا دسترسی ندارید" },
+          "401": { "description": "نیاز به احراز هویت" },
+          "500": { "description": "خطای سرور" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/tasks/{id}/status": {
+      "patch": {
+        "summary": "Edit Task Status (Admin Or Teacher)",
+        "tags" : ["Tasks"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "شناسه تمرین"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTaskStatusRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "تمرین بروز شد",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "400": { "description": "درخواست نامعتبر" },
+          "404": { "description": "تمرین پیدا نشد" },
+          "401": { "description": "نیاز به احراز هویت" },
+          "500": { "description": "خطای سرور" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    } 
   },
   "components": {
     "schemas": {
@@ -703,6 +898,46 @@
         }
         },
         "required": ["title"]
+      },
+      "schemas": {
+        "Task": {
+          "type": "object",
+          "properties": {
+            "_id": { "type": "string", "example": "64ac4d77..." },
+            "description": { "type": "string", "example": "تمرین شماره 1" },
+            "file": { "type": "string", "example": "/tasks/file123.pdf" },
+            "courseId": { "type": "string", "example": "64aaee1f..." },
+            "userId": { "type": "string", "example": "64abbc33..." },
+            "status": { "type": "string", "enum": ["بررسی شده", "بررسی نشده"], "default": "بررسی نشده" },
+            "score": { "type": "number", "default": 0, "minimum": 0, "maximum": 10 },
+            "feedback": { "type": "string", "nullable": true, "example": "64addf11..." },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "CreateTaskRequest": {
+          "type": "object",
+          "required": ["description", "courseId", "file"],
+          "properties": {
+            "description": { "type": "string", "example": "تمرین شماره 1" },
+            "courseId": { "type": "string", "example": "64aaee1f..." },
+            "file": { "type": "string", "format": "binary" }
+          }
+        },
+        "UpdateTaskStatusRequest": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "type": "string", "enum": ["بررسی شده", "بررسی نشده"] },
+            "score": { "type": "number", "minimum": 1, "maximum": 10 }
+          }
+        },
+        "EditTaskRequest": {
+          "type": "object",
+          "properties": {
+            "description": { "type": "string", "example": "توضیحات جدید" }
+          }
+        }
       }
       
     }
