@@ -7,19 +7,35 @@ const schema = mongoose.Schema(
       required: true,
       unique: true,
     },
-    username : {
+    username: {
       type: String,
       unique: true,
     },
-    avatar : {
-      type : String ,
-      default : "/images/OIP.jpg"
+    avatar: {
+      type: String,
+      default: "/images/OIP.jpg",
     },
+    courses: [{ 
+      type: mongoose.Schema.Types.ObjectId,
+       ref: "Course" }],
+
     role: {
       type: String,
-      enum: ["USER", "ADMIN" , "TEACHER"],
-      default: "USER",
+      enum: ["STUDENT", "MANAGER", "TEACHER"],
+      default: "STUDENT",
     },
+
+    averageScore: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 10
+    },
+    level: {
+      type: String,
+      enum: ["Beginner", "Intermediate", "Advanced"],
+      default: "Beginner"
+    }
   },
   { timestamps: true }
 );

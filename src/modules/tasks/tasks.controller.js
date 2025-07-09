@@ -1,5 +1,7 @@
 const Task = require("../../models/Task");
 const Course = require("../../models/Course");
+const User = require("../../models/User");
+const {updateUserAverageAndLevel} = require("../../services/userStats")
 
 exports.createTask = async (req, res) => {
   try {
@@ -73,6 +75,45 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
+exports.getTasksForTeacher = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).select("courses role");
+    if (!user) {
+      return res.status(404).json({ message: "کاربر یافت نشد" });
+    }
+    if (user.role !== "TEACHER") {
+      return res.status(403).json({ message: "دسترسی غیرمجاز" });
+    }
+
+    // پارامترهای کوئری با مقدار پیش‌فرض
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || "createdAt";
+    const order = req.query.order === "desc" ? -1 : 1;
+
+    const filter = { courseId: { $in: user.courses } };
+    const total = await Task.countDocuments(filter);
+
+    const tasks = await Task.find(filter)
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      totalItems: total,
+      tasks,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 exports.getMyTasks = async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -139,6 +180,8 @@ exports.updateTaskStatus = async (req, res) => {
         { status, ...(score !== undefined && { score }) },
         { new: true }
       );
+      await updateUserAverageAndLevel(task.userId);
+
   
       if (!task) {
         return res.status(404).json({ message: "تسک پیدا نشد." });

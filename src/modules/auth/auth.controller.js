@@ -119,7 +119,7 @@ exports.send = async (req, res, next) => {
       const user = await User.create({
         phone,
         username: phone,
-        role: isFirstUser ? "ADMIN" : "USER",
+        role: isFirstUser ? "MANAGER" : "STUDENT",
       });
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {

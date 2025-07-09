@@ -3,7 +3,7 @@ const User = require("../../models/User");
 
 exports.createCourse = async (req, res, next) => {
   try {
-    const { title, teacherId } = req.body;
+    const { title,englishTitle ,teacherId } = req.body;
 
     const teacher = await User.findById(teacherId);
 
@@ -11,7 +11,7 @@ exports.createCourse = async (req, res, next) => {
       return res.status(400).json({ message: "مدرس معتبر یافت نشد یا نقش اشتباه است." });
     }
 
-    const newCourse = new Course({ title, teacherId });
+    const newCourse = new Course({ title,englishTitle ,teacherId });
     await newCourse.save();
     res.status(201).json({ message: "دوره با موفقیت ایجاد شد.", course: newCourse });
   } catch (error) {

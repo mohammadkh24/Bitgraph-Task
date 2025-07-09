@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://bitgraph-task.onrender.com"
+      "url": "http://localhost:4000/"
     }
   ],
   "tags": [
@@ -327,6 +327,95 @@
         }
       }
     },
+    "/users/{userId}/set-teacher": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Set Teacher Role For User",
+        "description": "تغییر نقش یک کاربر به 'TEACHER' و افزودن دوره‌های مربوطه به او.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "شناسه کاربر",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "64d3fc21d9a5a84a30e935a3"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "courseIds": {
+                    "type": "array",
+                    "description": "آرایه‌ای از آیدی دوره‌ها",
+                    "items": {
+                      "type": "string",
+                      "example": "64d3fd3ebad79bf7d4b7748a"
+                    }
+                  }
+                },
+                "required": ["courseIds"]
+              },
+              "example": {
+                "courseIds": ["64d3fd3ebad79bf7d4b7748a", "64d3fd3ebad79bf7d4b7748b"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "نقش کاربر و دوره‌ها با موفقیت به‌روزرسانی شد",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "نقش کاربر به مدرس تغییر یافت",
+                  "user": {
+                    "_id": "64d3fc21d9a5a84a30e935a3",
+                    "role": "TEACHER",
+                    "courses": [
+                      "64d3fd3ebad79bf7d4b7748a",
+                      "64d3fd3ebad79bf7d4b7748b"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "درخواست نامعتبر (آیدی یا داده اشتباه)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "لطفا آیدی دوره‌های مدرس را وارد کنید"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "کاربر یا یکی از دوره‌ها پیدا نشد",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "کاربر یافت نشد."
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    
     "/courses": {
       "post": {
         "tags": ["Courses"],
@@ -343,6 +432,11 @@
                     "type": "string",
                     "description": "عنوان دوره",
                     "example": "دوره برنامه‌نویسی Node.js"
+                  },
+                  "englishTitle": {
+                    "type": "string",
+                    "description": "عنوان انگلیسی دوره",
+                    "example": "Node.js Course"
                   },
                   "teacherId": {
                     "type": "string",
@@ -837,6 +931,89 @@
         "security": [{ "bearerAuth": [] }]
       }
     },
+    "/teacher-tasks": {
+      "get": {
+        "summary": "Get tasks related to the teacher's courses",
+        "tags": ["Tasks"],
+        "description": "مدرس فقط می‌تواند تمرین‌های مربوط به دوره‌هایی که خودش مدرس آن‌ها است را ببیند. از پارامترهای page و limit برای پیجینیشن، و از sortBy و order برای مرتب‌سازی استفاده کنید.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "شماره صفحه (پیش‌فرض 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "تعداد آیتم در هر صفحه (پیش‌فرض 10)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "مرتب‌سازی بر اساس فیلد (مثلاً createdAt)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "نوع مرتب‌سازی: asc یا desc",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "لیست تمرین‌ها با موفقیت بازگردانده شد",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "لیست تمرین‌ها",
+                  "tasks": [
+                    {
+                      "_id": "665f20a6f447b3a3f91a9870",
+                      "title": "تمرین اول",
+                      "course": "دوره جاوااسکریپت",
+                      "createdAt": "2025-07-01T10:00:00.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10,
+                    "totalPages": 3,
+                    "totalTasks": 23
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "دسترسی غیرمجاز - فقط مدرس‌ها مجاز هستند"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/feedback": {
       "post": {
         "tags": ["Feedback"],
@@ -920,159 +1097,171 @@
       }
   } 
     },
-    "components": {
-      "securitySchemes": {
-        "bearerAuth": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
-        }
-      },
-      "schemas": {
-        "User": {
-          "type": "object",
-          "properties": {
-            "_id": { "type": "string", "example": "665f20a6f447b3a3f91a9870" },
-            "phone": { "type": "string", "example": "09123456789" },
-            "username": { "type": "string", "example": "09123456789" },
-            "avatar": { "type": "string", "example": "/images/OIP.jpg" },
-            "role": {
-              "type": "string",
-              "enum": ["USER", "ADMIN", "TEACHER"],
-              "example": "USER"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2025-06-10T09:25:43.511Z"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2025-06-10T09:25:43.511Z"
-            }
-          },
-          "required": ["phone"]
-        },
-        "Course": {
-          "type": "object",
-          "properties": {
-            "_id": { "type": "string", "example": "665f123abc456" },
-            "title": { "type": "string", "example": "دوره فیگما" },
-            "teacherId": {
-              "type": "string",
-              "description": "شناسه مدرس دوره",
-              "example": "60d0fe4f5311236168a109ca"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2025-06-10T09:25:43.511Z"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time",
-              "example": "2025-06-10T09:25:43.511Z"
-            }
-          },
-          "required": ["title"]
-        },
-        "Task": {
-          "type": "object",
-          "properties": {
-            "_id": { "type": "string", "example": "64ac4d77..." },
-            "description": { "type": "string", "example": "تمرین شماره 1" },
-            "file": { "type": "string", "example": "/tasks/file123.pdf" },
-            "courseId": { "type": "string", "example": "64aaee1f..." },
-            "userId": { "type": "string", "example": "64abbc33..." },
-            "status": {
-              "type": "string",
-              "enum": ["بررسی شده", "بررسی نشده"],
-              "default": "بررسی نشده"
-            },
-            "score": {
-              "type": "number",
-              "default": 0,
-              "minimum": 0,
-              "maximum": 10
-            },
-            "feedback": {
-              "type": "string",
-              "nullable": true,
-              "example": "64addf11..."
-            },
-            "createdAt": { "type": "string", "format": "date-time" },
-            "updatedAt": { "type": "string", "format": "date-time" }
+    
+      "components": {
+        "securitySchemes": {
+          "bearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
           }
         },
-        "CreateTaskRequest": {
-          "type": "object",
-          "required": ["description", "courseId", "file"],
-          "properties": {
-            "description": { "type": "string", "example": "تمرین شماره 1" },
-            "courseId": { "type": "string", "example": "64aaee1f..." },
-            "file": { "type": "string", "format": "binary" }
-          }
-        },
-        "UpdateTaskStatusRequest": {
-          "type": "object",
-          "required": ["status"],
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": ["بررسی شده", "بررسی نشده"]
+        "schemas": {
+          "User": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string", "example": "665f20a6f447b3a3f91a9870" },
+              "phone": { "type": "string", "example": "09123456789" },
+              "username": { "type": "string", "example": "09123456789" },
+              "avatar": { "type": "string", "example": "/images/OIP.jpg" },
+              "role": {
+                "type": "string",
+                "enum": ["USER", "ADMIN", "TEACHER"],
+                "example": "USER"
+              },
+              "courses": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-10T09:25:43.511Z"
+              },
+              "averageScore": {
+                "type": "number",
+                "example": 6.2,
+                "description": "میانگین نمرات تمرین‌های دانشجو"
+              },
+              "level": {
+                "type": "string",
+                "enum": ["Beginner", "Intermediate", "Advanced"],
+                "example": "Intermediate",
+                "description": "سطح کاربر بر اساس میانگین نمره"
+              },              
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-10T09:25:43.511Z"
+              }
             },
-            "score": { "type": "number", "minimum": 1, "maximum": 10 }
-          }
-        },
-        "EditTaskRequest": {
-          "type": "object",
-          "properties": {
-            "description": { "type": "string", "example": "توضیحات جدید" }
-          }
-        },
-        "CreateFeedbackRequest": {
-          "type": "object",
-          "properties": {
-            "taskId": {
-              "type": "string",
-              "description": "ID of the task to give feedback for"
+            "required": ["phone"]
+          },
+          "Course": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string", "example": "665f123abc456" },
+              "title": { "type": "string", "example": "دوره فیگما" },
+              "englishTitle": { "type": "string", "example": "Figma" },
+              "teacherId": {
+                "type": "string",
+                "description": "شناسه مدرس دوره",
+                "example": "60d0fe4f5311236168a109ca"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-10T09:25:43.511Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-10T09:25:43.511Z"
+              }
             },
-            "text": {
-              "type": "string",
-              "description": "Feedback text"
+            "required": ["title"]
+          },
+          "Task": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string", "example": "64ac4d77..." },
+              "description": { "type": "string", "example": "تمرین شماره 1" },
+              "file": { "type": "string", "example": "/tasks/file123.pdf" },
+              "courseId": { "type": "string", "example": "64aaee1f..." },
+              "userId": { "type": "string", "example": "64abbc33..." },
+              "status": {
+                "type": "string",
+                "enum": ["بررسی شده", "بررسی نشده"],
+                "default": "بررسی نشده"
+              },
+              "score": {
+                "type": "number",
+                "default": 0,
+                "minimum": 0,
+                "maximum": 10
+              },
+              "feedback": {
+                "type": "string",
+                "nullable": true,
+                "example": "64addf11..."
+              },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" }
             }
           },
-          "required": ["taskId", "text"]
-        },
-        "UpdateFeedbackRequest": {
-          "type": "object",
-          "properties": {
-            "text": {
-              "type": "string",
-              "description": "Updated feedback text"
+          "CreateTaskRequest": {
+            "type": "object",
+            "required": ["description", "courseId", "file"],
+            "properties": {
+              "description": { "type": "string", "example": "تمرین شماره 1" },
+              "courseId": { "type": "string", "example": "64aaee1f..." },
+              "file": { "type": "string", "format": "binary" }
             }
           },
-          "required": ["text"]
-        },
-        "FeedbackResponse": {
-          "type": "object",
-          "properties": {
-            "message": { "type": "string" },
-            "feedback": {
-              "type": "object",
-              "properties": {
-                "_id": { "type": "string" },
-                "text": { "type": "string" },
-                "taskId": { "type": "string" },
-                "teacherId": { "type": "string" },
-                "createdAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "updatedAt": {
-                  "type": "string",
-                  "format": "date-time"
+          "UpdateTaskStatusRequest": {
+            "type": "object",
+            "required": ["status"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["بررسی شده", "بررسی نشده"]
+              },
+              "score": { "type": "number", "minimum": 1, "maximum": 10 }
+            }
+          },
+          "EditTaskRequest": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string", "example": "توضیحات جدید" }
+            }
+          },
+          "CreateFeedbackRequest": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "description": "ID of the task to give feedback for"
+              },
+              "text": {
+                "type": "string",
+                "description": "Feedback text"
+              }
+            },
+            "required": ["taskId", "text"]
+          },
+          "UpdateFeedbackRequest": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Updated feedback text"
+              }
+            },
+            "required": ["text"]
+          },
+          "FeedbackResponse": {
+            "type": "object",
+            "properties": {
+              "message": { "type": "string" },
+              "feedback": {
+                "type": "object",
+                "properties": {
+                  "_id": { "type": "string" },
+                  "text": { "type": "string" },
+                  "taskId": { "type": "string" },
+                  "teacherId": { "type": "string" },
+                  "createdAt": { "type": "string", "format": "date-time" },
+                  "updatedAt": { "type": "string", "format": "date-time" }
                 }
               }
             }
@@ -1080,4 +1269,4 @@
         }
       }
     }
-}
+    

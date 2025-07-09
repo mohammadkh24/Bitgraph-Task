@@ -1,11 +1,11 @@
 module.exports = async (req, res, next) => {
-    const isAdmin = req.user.role === "ADMIN";
+    const isManager = req.user.role === "MANAGER";
   
-    if (isAdmin) {
+    if (isManager) {
       return next();
     }
   
     res.status(403).json({
-      message: "This route accessible only for admin",
+      message: "This route accessible only for manager",
     });
   };

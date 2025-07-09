@@ -4,7 +4,9 @@ const controller = require("./tasks.controller");
 const { auth } = require("../../middlewares/auth");
 const validate = require("../../middlewares/validate");
 const isAdminOrTeacher = require("../../middlewares/isAdminOrTeacher");
-const {createTaskValidator} = require("./tasks.validator")
+const isAdmin = require("../../middlewares/isAdmin");
+const {createTaskValidator} = require("./tasks.validator");
+const isTeacher = require("../../middlewares/isTeacher");
 
 const router = express.Router();
 
@@ -19,9 +21,11 @@ router.post(
 
 router.get("/me", auth, controller.getMyTasks);
 
-router.get("/",auth, isAdminOrTeacher ,controller.getAllTasks);
+router.get("/",auth, isAdmin ,controller.getAllTasks);
 
-router.get("/:id",auth, isAdminOrTeacher,controller.getTaskById);
+router.get("/teacher-taks",auth, isTeacher ,controller.getTasksForTeacher);
+
+router.get("/:id",auth, isAdmin,controller.getTaskById);
 
 router.patch("/:id/status",auth , isAdminOrTeacher ,controller.updateTaskStatus);
 
